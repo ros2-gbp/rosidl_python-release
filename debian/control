@@ -1,0 +1,12 @@
+Source: ros-kilted-rosidl-generator-py
+Section: misc
+Priority: optional
+Maintainer: Dharini Dutia <dharini@openrobotics.org>
+Build-Depends: debhelper (>= 9.0.0), python3-numpy <!nocheck>, python3-pytest <!nocheck>, ros-kilted-ament-cmake, ros-kilted-ament-cmake-pytest <!nocheck>, ros-kilted-ament-index-python <!nocheck>, ros-kilted-ament-lint-auto <!nocheck>, ros-kilted-ament-lint-common <!nocheck>, ros-kilted-rmw <!nocheck>, ros-kilted-rosidl-cmake <!nocheck>, ros-kilted-rosidl-generator-c <!nocheck>, ros-kilted-rosidl-generator-cpp <!nocheck>, ros-kilted-rosidl-parser <!nocheck>, ros-kilted-rosidl-runtime-c, ros-kilted-rosidl-typesupport-c <!nocheck>, ros-kilted-rosidl-typesupport-fastrtps-c <!nocheck>, ros-kilted-rosidl-typesupport-introspection-c <!nocheck>, ros-kilted-rpyutils <!nocheck>, ros-kilted-test-interface-files <!nocheck>, ros-kilted-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-kilted-rosidl-generator-py
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, python3-numpy, ros-kilted-ament-cmake, ros-kilted-ament-cmake-cppcheck, ros-kilted-ament-cmake-cpplint, ros-kilted-ament-cmake-flake8, ros-kilted-ament-cmake-pep257, ros-kilted-ament-cmake-uncrustify, ros-kilted-ament-index-python, ros-kilted-rmw, ros-kilted-rosidl-cli, ros-kilted-rosidl-generator-c, ros-kilted-rosidl-parser, ros-kilted-rosidl-pycommon, ros-kilted-rosidl-runtime-c, ros-kilted-rosidl-typesupport-c, ros-kilted-rosidl-typesupport-interface, ros-kilted-rpyutils, ros-kilted-ros-workspace
+Description: Generate the ROS interfaces in Python.
