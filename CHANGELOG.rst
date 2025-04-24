@@ -2,6 +2,13 @@
 Changelog for package rosidl_generator_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.22.1 (2025-04-24)
+-------------------
+* fix (`#224 <https://github.com/ros2/rosidl_python/issues/224>`_) (`#227 <https://github.com/ros2/rosidl_python/issues/227>`_)
+  (cherry picked from commit 8aefd489b840d46c138245095402fcc50d3559f4)
+  Co-authored-by: Michael Carlstrom <rmc@carlstrom.com>
+* Contributors: mergify[bot]
+
 0.22.0 (2024-04-16)
 -------------------
 * Revert install of .so files into python path (`#211 <https://github.com/ros2/rosidl_python/issues/211>`_)
