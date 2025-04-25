@@ -2,12 +2,28 @@
 Changelog for package rosidl_generator_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.22.1 (2025-04-24)
+0.25.0 (2025-04-25)
 -------------------
-* fix (`#224 <https://github.com/ros2/rosidl_python/issues/224>`_) (`#227 <https://github.com/ros2/rosidl_python/issues/227>`_)
-  (cherry picked from commit 8aefd489b840d46c138245095402fcc50d3559f4)
-  Co-authored-by: Michael Carlstrom <rmc@carlstrom.com>
-* Contributors: mergify[bot]
+
+0.24.1 (2025-04-18)
+-------------------
+* Fix `__eq__` for Array fields (`#224 <https://github.com/ros2/rosidl_python/issues/224>`_)
+* Remove use of ament_target_dependencies (`#222 <https://github.com/ros2/rosidl_python/issues/222>`_)
+* Contributors: Michael Carlstrom, Shane Loretz
+
+0.24.0 (2024-11-20)
+-------------------
+* Revamp how we check for the correct class. (`#218 <https://github.com/ros2/rosidl_python/issues/218>`_)
+* Remove python_cmake_module and set hints (`#204 <https://github.com/ros2/rosidl_python/issues/204>`_)
+* Contributors: Chris Lalancette
+
+0.23.1 (2024-06-17)
+-------------------
+* Add rosidl_generator_py to the rosidl_runtime_packages group (`#212 <https://github.com/ros2/rosidl_python/issues/212>`_)
+* Contributors: Scott K Logan
+
+0.23.0 (2024-04-26)
+-------------------
 
 0.22.0 (2024-04-16)
 -------------------

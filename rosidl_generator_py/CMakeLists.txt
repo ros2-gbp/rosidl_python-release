@@ -22,14 +22,10 @@ if(BUILD_TESTING)
 
   find_package(test_interface_files REQUIRED)
 
-  find_package(python_cmake_module REQUIRED)
-  find_package(PythonExtra MODULE REQUIRED)
-
   include(cmake/register_py.cmake)
   include(cmake/rosidl_generator_py_get_typesupports.cmake)
 
-  # Trick ament_target_dependencies() into thinking this package has been found
-  set(rosidl_generator_py_FOUND "1")
+  # Trick ament_execute_extensions into finding this extension in the source space
   set(rosidl_generator_py_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
   # Need to call extras before get_typesupports, to register the extension
