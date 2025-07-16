@@ -2,6 +2,11 @@
 Changelog for package rosidl_generator_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.14.5 (2025-07-16)
+-------------------
+* fix (`#224 <https://github.com/ros2/rosidl_python/issues/224>`_) (`#226 <https://github.com/ros2/rosidl_python/issues/226>`_)
+* Contributors: mergify[bot]
+
 0.14.4 (2022-11-08)
 -------------------
 * Humble: Backport NaN fixes (`#188 <https://github.com/ros2/rosidl_python/issues/188>`_)
