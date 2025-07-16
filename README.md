@@ -1,3 +1,26 @@
+## rosidl_python (humble) - 0.14.5-1
+
+The packages in the `rosidl_python` repository were released into the `humble` distro by running `/usr/bin/bloom-release --track humble --rosdistro humble rosidl_python` on `Wed, 16 Jul 2025 18:57:27 -0000`
+
+The `rosidl_generator_py` package was released.
+
+Version of package(s) in repository `rosidl_python`:
+
+- upstream repository: https://github.com/ros2/rosidl_python.git
+- release repository: https://github.com/ros2-gbp/rosidl_python-release.git
+- rosdistro version: `0.14.4-1`
+- old version: `0.14.4-1`
+- new version: `0.14.5-1`
+
+Versions of tools used:
+
+- bloom version: `0.12.0`
+- catkin_pkg version: `1.0.0`
+- rosdep version: `0.25.1`
+- rosdistro version: `1.0.1`
+- vcstools version: `0.1.42`
+
+
 ## rosidl_python (rolling) - 0.25.0-1
 
 The packages in the `rosidl_python` repository were released into the `rolling` distro by running `/home/cottsay/infra_ws/install/bloom/bin/bloom-release rosidl_python -r rolling` on `Fri, 25 Apr 2025 18:22:39 -0000`
