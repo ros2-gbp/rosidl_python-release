@@ -138,7 +138,7 @@ for member in message.structure.members:
 @#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
-class Metaclass_@(message.structure.namespaced_type.name)(type):
+class Metaclass_@(message.structure.namespaced_type.name)(rosidl_pycommon.interface_base_classes.MessageTypeSupportMeta):
     """Metaclass of message '@(message.structure.namespaced_type.name)'."""
 
     _CREATE_ROS_MESSAGE: typing.ClassVar[typing.Optional[PyCapsule]] = None
@@ -244,7 +244,7 @@ for member in message.structure.members:
 @[end for]@
 
 
-class @(message.structure.namespaced_type.name)(metaclass=Metaclass_@(message.structure.namespaced_type.name)):
+class @(message.structure.namespaced_type.name)(rosidl_pycommon.interface_base_classes.BaseMessage, metaclass=Metaclass_@(message.structure.namespaced_type.name)):
 @[if not message.constants]@
     """Message class '@(message.structure.namespaced_type.name)'."""
 @[else]@
@@ -401,8 +401,7 @@ if isinstance(type_, AbstractNestedType):
         if @(member.name) is None:
             self.@(member.name) = numpy.zeros(@(member.type.size), dtype=@(SPECIAL_NESTED_BASIC_TYPES[member.type.value_type.typename]['dtype']))
         else:
-            self.@(member.name) = numpy.array(@(member.name), dtype=@(SPECIAL_NESTED_BASIC_TYPES[member.type.value_type.typename]['dtype']))
-            assert self.@(member.name).shape == (@(member.type.size), )
+            self.@(member.name) = @(member.name)
 @[        else]@
         self.@(member.name) = @(member.name) if @(member.name) is not None else [@(get_python_type(type_))() for x in range(@(member.type.size))]
 @[        end if]@
