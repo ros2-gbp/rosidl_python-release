@@ -15,7 +15,7 @@
 from rosidl_generator_py.msg import Property
 
 
-def test_msg_property() -> None:
+def test_msg_property():
     msg = Property()
 
     # types

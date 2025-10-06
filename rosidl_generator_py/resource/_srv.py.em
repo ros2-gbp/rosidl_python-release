@@ -5,34 +5,28 @@ from rosidl_pycommon import convert_camel_case_to_lower_case_underscore
 service_name = '_' + convert_camel_case_to_lower_case_underscore(service.namespaced_type.name)
 module_name = '_' + convert_camel_case_to_lower_case_underscore(interface_path.stem)
 
-type_annotations_import_statements.add(f'from {".".join(service.namespaced_type.namespaces)} import {service.request_message.structure.namespaced_type.name}')
-type_annotations_import_statements.add(f'from {".".join(service.namespaced_type.namespaces)} import {service.response_message.structure.namespaced_type.name}')
-
 TEMPLATE(
     '_msg.py.em',
     package_name=package_name, interface_path=interface_path,
-    message=service.request_message, import_statements=import_statements,
-    type_annotations_import_statements=type_annotations_import_statements)
+    message=service.request_message, import_statements=import_statements)
 TEMPLATE(
     '_msg.py.em',
     package_name=package_name, interface_path=interface_path,
-    message=service.response_message, import_statements=import_statements,
-    type_annotations_import_statements=type_annotations_import_statements)
+    message=service.response_message, import_statements=import_statements)
 TEMPLATE(
     '_msg.py.em',
     package_name=package_name, interface_path=interface_path,
-    message=service.event_message, import_statements=import_statements,
-    type_annotations_import_statements=type_annotations_import_statements)
+    message=service.event_message, import_statements=import_statements)
 }@
 
 
-class Metaclass_@(service.namespaced_type.name)(rosidl_pycommon.interface_base_classes.ServiceTypeSupportMeta):
+class Metaclass_@(service.namespaced_type.name)(type):
     """Metaclass of service '@(service.namespaced_type.name)'."""
 
-    _TYPE_SUPPORT: typing.ClassVar[typing.Optional[PyCapsule]] = None
+    _TYPE_SUPPORT = None
 
     @@classmethod
-    def __import_type_support__(cls) -> None:
+    def __import_type_support__(cls):
         try:
             from rosidl_generator_py import import_type_support
             module = import_type_support('@(package_name)')
@@ -56,14 +50,10 @@ class Metaclass_@(service.namespaced_type.name)(rosidl_pycommon.interface_base_c
                 @(module_name).Metaclass_@(service.event_message.structure.namespaced_type.name).__import_type_support__()
 
 
-class @(service.namespaced_type.name)(rosidl_pycommon.interface_base_classes.BaseService[
-    @(service.request_message.structure.namespaced_type.name),
-    @(service.response_message.structure.namespaced_type.name)
-], metaclass=Metaclass_@(service.namespaced_type.name)):
-    Request: type[@(service.request_message.structure.namespaced_type.name)] = @(service.request_message.structure.namespaced_type.name)
-    Response: type[@(service.response_message.structure.namespaced_type.name)] = @(service.response_message.structure.namespaced_type.name)
+class @(service.namespaced_type.name)(metaclass=Metaclass_@(service.namespaced_type.name)):
+    from @('.'.join(service.namespaced_type.namespaces)).@(module_name) import @(service.request_message.structure.namespaced_type.name) as Request
+    from @('.'.join(service.namespaced_type.namespaces)).@(module_name) import @(service.response_message.structure.namespaced_type.name) as Response
     from @('.'.join(service.namespaced_type.namespaces)).@(module_name) import @(service.event_message.structure.namespaced_type.name) as Event
 
-    # Should eventually be typing.NoReturn. See mypy#14044
-    def __init__(self) -> None:
+    def __init__(self):
         raise NotImplementedError('Service classes can not be instantiated')

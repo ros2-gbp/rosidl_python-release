@@ -4,9 +4,6 @@
 from rosidl_pycommon import convert_camel_case_to_lower_case_underscore
 from rosidl_generator_py.generate_py_impl import constant_value_to_py
 from rosidl_generator_py.generate_py_impl import get_python_type
-from rosidl_generator_py.generate_py_impl import get_type_annotation_constant
-from rosidl_generator_py.generate_py_impl import get_type_annotation_default
-from rosidl_generator_py.generate_py_impl import get_setter_and_getter_type
 from rosidl_generator_py.generate_py_impl import SPECIAL_NESTED_BASIC_TYPES
 from rosidl_generator_py.generate_py_impl import value_to_py
 from rosidl_parser.definition import AbstractGenericString
@@ -32,53 +29,6 @@ from rosidl_parser.definition import SIGNED_INTEGER_TYPES
 from rosidl_parser.definition import UnboundedSequence
 from rosidl_parser.definition import UNSIGNED_INTEGER_TYPES
 }@
-@{
-import_type_checking = False
-type_annotations_setter: dict[str, str] = {}
-type_annotations_getter: dict[str, str] = {}
-type_imports: set[str] = set()
-
-# Types which always exist
-# Done in one multi-line string to preserve order
-type_imports.add(
-    """from ctypes import Structure
-
-    class PyCapsule(Structure):
-        pass  # don't need to define the full structure""")
-for member in message.structure.members:
-    setter_type, getter_type = get_setter_and_getter_type(member, type_imports)
-    type_annotations_setter[member.name] = setter_type
-    type_annotations_getter[member.name] = getter_type
-
-custom_type_annotations = {}
-
-for constant in message.constants:
-    custom_type_annotations[constant.name] = get_type_annotation_constant(constant)
-
-default_type_annotations = {}
-
-for member in message.structure.members:
-    if member.has_annotation('default'):
-        default_type_annotations[member.name] = get_type_annotation_default(member)
-}@
-@{
-suffix = '__'.join(message.structure.namespaced_type.namespaces[1:]) + '__' + convert_camel_case_to_lower_case_underscore(message.structure.namespaced_type.name)
-type_annotations_import_statements_copy = type_annotations_import_statements.copy()
-}@
-
-
-if typing.TYPE_CHECKING:
-@[for type_import in type_imports]@
-@[if type_import not in type_annotations_import_statements]@
-    @(type_import)
-@{
-type_annotations_import_statements.add(type_import)
-}@
-@[end if]@
-@[end for]@
-@[if type_annotations_import_statements == type_annotations_import_statements_copy]@
-    pass
-@[end if]@
 @#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 @# Collect necessary import statements for all members
 @{
@@ -138,34 +88,25 @@ for member in message.structure.members:
 @#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
-class Metaclass_@(message.structure.namespaced_type.name)(rosidl_pycommon.interface_base_classes.MessageTypeSupportMeta):
+class Metaclass_@(message.structure.namespaced_type.name)(type):
     """Metaclass of message '@(message.structure.namespaced_type.name)'."""
 
-    _CREATE_ROS_MESSAGE: typing.ClassVar[typing.Optional[PyCapsule]] = None
-    _CONVERT_FROM_PY: typing.ClassVar[typing.Optional[PyCapsule]] = None
-    _CONVERT_TO_PY: typing.ClassVar[typing.Optional[PyCapsule]] = None
-    _DESTROY_ROS_MESSAGE: typing.ClassVar[typing.Optional[PyCapsule]] = None
-    _TYPE_SUPPORT: typing.ClassVar[typing.Optional[PyCapsule]] = None
+    _CREATE_ROS_MESSAGE = None
+    _CONVERT_FROM_PY = None
+    _CONVERT_TO_PY = None
+    _DESTROY_ROS_MESSAGE = None
+    _TYPE_SUPPORT = None
 
-    class @(message.structure.namespaced_type.name)Constants(typing.TypedDict):
-@[if not custom_type_annotations]@
-        pass
-@[else]@
-@[for constant in message.constants]@
-        @(constant.name): @(custom_type_annotations[constant.name])
-@[     end for]@
-@[end if]@
-
-    __constants: @(message.structure.namespaced_type.name)Constants = {
+    __constants = {
 @[for constant in message.constants]@
         '@(constant.name)': @constant_value_to_py(constant.type, constant.value),
 @[end for]@
     }
 
     @@classmethod
-    def __import_type_support__(cls) -> None:
+    def __import_type_support__(cls):
         try:
-            from rosidl_generator_py import import_type_support  # type: ignore[attr-defined]
+            from rosidl_generator_py import import_type_support
             module = import_type_support('@(package_name)')
         except ImportError:
             import logging
@@ -176,6 +117,9 @@ class Metaclass_@(message.structure.namespaced_type.name)(rosidl_pycommon.interf
                 'Failed to import needed modules for type support:\n' +
                 traceback.format_exc())
         else:
+@{
+suffix = '__'.join(message.structure.namespaced_type.namespaces[1:]) + '__' + convert_camel_case_to_lower_case_underscore(message.structure.namespaced_type.name)
+}@
             cls._CREATE_ROS_MESSAGE = module.create_ros_message_msg__@(suffix)
             cls._CONVERT_FROM_PY = module.convert_from_py_msg__@(suffix)
             cls._CONVERT_TO_PY = module.convert_to_py_msg__@(suffix)
@@ -207,18 +151,18 @@ for member in message.structure.members:
 @[for typename in sorted(importable_typesupports)]@
 
             from @('.'.join(typename[:-2])) import @(typename[-2])
-            if @(typename[-1])._TYPE_SUPPORT is None:
-                @(typename[-1]).__import_type_support__()
+            if @(typename[-1]).__class__._TYPE_SUPPORT is None:
+                @(typename[-1]).__class__.__import_type_support__()
 @[end for]@
 
     @@classmethod
-    def __prepare__(metacls, name: str, bases: tuple[type[typing.Any], ...], /, **kwds: typing.Any) -> collections.abc.MutableMapping[str, object]:
+    def __prepare__(cls, name, bases, **kwargs):
         # list constant names here so that they appear in the help text of
         # the message class under "Data and other attributes defined here:"
         # as well as populate each message instance
         return {
 @[for constant in message.constants]@
-            '@(constant.name)': metacls.__constants['@(constant.name)'],
+            '@(constant.name)': cls.__constants['@(constant.name)'],
 @[end for]@
 @[for member in message.structure.members]@
 @[  if member.has_annotation('default')]@
@@ -229,7 +173,7 @@ for member in message.structure.members:
 @[for constant in message.constants]@
 
     @@property
-    def @(constant.name)(self) -> @(custom_type_annotations[constant.name]):
+    def @(constant.name)(self):
         """Message constant '@(constant.name)'."""
         return Metaclass_@(message.structure.namespaced_type.name).__constants['@(constant.name)']
 @[end for]@
@@ -237,14 +181,14 @@ for member in message.structure.members:
 @[  if member.has_annotation('default')]@
 
     @@property
-    def @(member.name.upper())__DEFAULT(cls) -> @(default_type_annotations[member.name]):
+    def @(member.name.upper())__DEFAULT(cls):
         """Return default value for message field '@(member.name)'."""
         return @(value_to_py(member.type, member.get_annotation_value('default')['value']))
 @[  end if]@
 @[end for]@
 
 
-class @(message.structure.namespaced_type.name)(rosidl_pycommon.interface_base_classes.BaseMessage, metaclass=Metaclass_@(message.structure.namespaced_type.name)):
+class @(message.structure.namespaced_type.name)(metaclass=Metaclass_@(message.structure.namespaced_type.name)):
 @[if not message.constants]@
     """Message class '@(message.structure.namespaced_type.name)'."""
 @[else]@
@@ -268,7 +212,7 @@ class @(message.structure.namespaced_type.name)(rosidl_pycommon.interface_base_c
         '_check_fields',
     ]
 
-    _fields_and_field_types: dict[str, str] = {
+    _fields_and_field_types = {
 @[for member in message.structure.members]@
 @[  if len(message.structure.members) == 1 and member.name == EMPTY_STRUCTURE_REQUIRED_MEMBER_NAME]@
 @[    continue]@
@@ -313,7 +257,7 @@ string@
 
     # This attribute is used to store an rosidl_parser.definition variable
     # related to the data type of each of the components the message.
-    SLOT_TYPES: tuple[rosidl_parser.definition.AbstractType, ...] = (
+    SLOT_TYPES = (
 @[for member in message.structure.members]@
 @[  if len(message.structure.members) == 1 and member.name == EMPTY_STRUCTURE_REQUIRED_MEMBER_NAME]@
 @[    continue]@
@@ -349,25 +293,15 @@ if isinstance(type_, AbstractNestedType):
 @[end for]@
     )
 
-    def __init__(self, *,
-@[for member in message.structure.members]@
-@[  if len(message.structure.members) == 1 and member.name == EMPTY_STRUCTURE_REQUIRED_MEMBER_NAME]@
-@[    continue]@
-@[  end if]@
-@{
-import inspect
-import builtins
-noqa_string = ''
-if member.name in dict(inspect.getmembers(builtins)).keys():
-    noqa_string = ', A002'
-}@
-                 @(member.name): typing.Optional[@(type_annotations_setter[member.name])] = None,  # noqa: E501@(noqa_string)
-@[end for]@
-                 check_fields: typing.Optional[bool] = None) -> None:
-        if check_fields is not None:
-            self._check_fields = check_fields
+    def __init__(self, **kwargs):
+        if 'check_fields' in kwargs:
+            self._check_fields = kwargs['check_fields']
         else:
             self._check_fields = ros_python_check_fields == '1'
+        if self._check_fields:
+            assert all('_' + key in self.__slots__ for key in kwargs.keys()), \
+                'Invalid arguments passed to constructor: %s' % \
+                ', '.join(sorted(k for k in kwargs.keys() if '_' + k not in self.__slots__))
 @[for member in message.structure.members]@
 @[  if len(message.structure.members) == 1 and member.name == EMPTY_STRUCTURE_REQUIRED_MEMBER_NAME]@
 @[    continue]@
@@ -378,7 +312,8 @@ if isinstance(type_, AbstractNestedType):
     type_ = type_.value_type
 }@
 @[  if member.has_annotation('default')]@
-        self.@(member.name) = @(member.name) if @(member.name) is not None else @(message.structure.namespaced_type.name).@(member.name.upper())__DEFAULT
+        self.@(member.name) = kwargs.get(
+            '@(member.name)', @(message.structure.namespaced_type.name).@(member.name.upper())__DEFAULT)
 @[  else]@
 @[    if isinstance(type_, NamespacedType) and not isinstance(member.type, AbstractSequence)]@
 @[      if (
@@ -393,40 +328,49 @@ if isinstance(type_, AbstractNestedType):
 @[    end if]@
 @[    if isinstance(member.type, Array)]@
 @[      if isinstance(type_, BasicType) and type_.typename == 'octet']@
-        self.@(member.name) = @(member.name) if @(member.name) is not None else [bytes([0]) for x in range(@(member.type.size))]
+        self.@(member.name) = kwargs.get(
+            '@(member.name)',
+            [bytes([0]) for x in range(@(member.type.size))]
+        )
 @[      elif isinstance(type_, BasicType) and type_.typename in CHARACTER_TYPES]@
-        self.@(member.name) = @(member.name) if @(member.name) is not None else [chr(0) for x in range(@(member.type.size))]
+        self.@(member.name) = kwargs.get(
+            '@(member.name)',
+            [chr(0) for x in range(@(member.type.size))]
+        )
 @[      else]@
 @[        if isinstance(member.type.value_type, BasicType) and member.type.value_type.typename in SPECIAL_NESTED_BASIC_TYPES]@
-        if @(member.name) is None:
+        if '@(member.name)' not in kwargs:
             self.@(member.name) = numpy.zeros(@(member.type.size), dtype=@(SPECIAL_NESTED_BASIC_TYPES[member.type.value_type.typename]['dtype']))
         else:
-            self.@(member.name) = @(member.name)
+            self.@(member.name) = kwargs.get('@(member.name)')
 @[        else]@
-        self.@(member.name) = @(member.name) if @(member.name) is not None else [@(get_python_type(type_))() for x in range(@(member.type.size))]
+        self.@(member.name) = kwargs.get(
+            '@(member.name)',
+            [@(get_python_type(type_))() for x in range(@(member.type.size))]
+        )
 @[        end if]@
 @[      end if]@
 @[    elif isinstance(member.type, AbstractSequence)]@
 @[      if isinstance(member.type.value_type, BasicType) and member.type.value_type.typename in SPECIAL_NESTED_BASIC_TYPES]@
-        self.@(member.name) = @(member.name) if @(member.name) is not None else array.array('@(SPECIAL_NESTED_BASIC_TYPES[member.type.value_type.typename]['type_code'])', [])
+        self.@(member.name) = array.array('@(SPECIAL_NESTED_BASIC_TYPES[member.type.value_type.typename]['type_code'])', kwargs.get('@(member.name)', []))
 @[      else]@
-        self.@(member.name) = @(member.name) if @(member.name) is not None else []
+        self.@(member.name) = kwargs.get('@(member.name)', [])
 @[      end if]@
 @[    elif isinstance(type_, BasicType) and type_.typename == 'octet']@
-        self.@(member.name) = @(member.name) if @(member.name) is not None else bytes([0])
+        self.@(member.name) = kwargs.get('@(member.name)', bytes([0]))
 @[    elif isinstance(type_, BasicType) and type_.typename in CHARACTER_TYPES]@
-        self.@(member.name) = @(member.name) if @(member.name) is not None else chr(0)
+        self.@(member.name) = kwargs.get('@(member.name)', chr(0))
 @[    else]@
-        self.@(member.name) = @(member.name) if @(member.name) is not None else @(get_python_type(type_))()
+        self.@(member.name) = kwargs.get('@(member.name)', @(get_python_type(type_))())
 @[    end if]@
 @[  end if]@
 @[end for]@
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         typename = self.__class__.__module__.split('.')
         typename.pop()
         typename.append(self.__class__.__name__)
-        args: list[str] = []
+        args = []
         for s, t in zip(self.get_fields_and_field_types().keys(), self.SLOT_TYPES):
             field = getattr(self, s)
             fieldstr = repr(field)
@@ -449,8 +393,8 @@ if isinstance(type_, AbstractNestedType):
             args.append(s + '=' + fieldstr)
         return '%s(%s)' % ('.'.join(typename), ', '.join(args))
 
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, @(message.structure.namespaced_type.name)):
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
             return False
 @[for member in message.structure.members]@
 @[  if len(message.structure.members) == 1 and member.name == EMPTY_STRUCTURE_REQUIRED_MEMBER_NAME]@
@@ -466,7 +410,7 @@ if isinstance(type_, AbstractNestedType):
         return True
 
     @@classmethod
-    def get_fields_and_field_types(cls) -> dict[str, str]:
+    def get_fields_and_field_types(cls):
         from copy import copy
         return copy(cls._fields_and_field_types)
 @[for member in message.structure.members]@
@@ -479,21 +423,19 @@ type_ = member.type
 if isinstance(type_, AbstractNestedType):
     type_ = type_.value_type
 
+import inspect
+import builtins
 noqa_string = ''
 if member.name in dict(inspect.getmembers(builtins)).keys():
     noqa_string = '  # noqa: A003'
-
-array_type_commment = ''
-if isinstance(member.type, (Array, AbstractSequence)):
-    array_type_commment = '   # typing.Annotated can be remove after mypy 1.16+ see mypy#3004'
 }@
     @@builtins.property@(noqa_string)
-    def @(member.name)(self) -> @(type_annotations_getter[member.name]):@(noqa_string)@(array_type_commment)
+    def @(member.name)(self):@(noqa_string)
         """Message field '@(member.name)'."""
         return self._@(member.name)
 
     @@@(member.name).setter@(noqa_string)
-    def @(member.name)(self, value: @(type_annotations_setter[member.name])) -> None:@(noqa_string)
+    def @(member.name)(self, value):@(noqa_string)
         if self._check_fields:
 @[  if isinstance(member.type, AbstractNestedType) and isinstance(member.type.value_type, BasicType) and member.type.value_type.typename in SPECIAL_NESTED_BASIC_TYPES]@
 @[    if isinstance(member.type, Array)]@
@@ -534,6 +476,8 @@ if isinstance(member.type, (Array, AbstractSequence)):
             from collections import UserString
 @[  elif isinstance(type_, AbstractGenericString) and type_.has_maximum_size()]@
             from collections import UserString
+@[  elif isinstance(type_, BasicType) and type_.typename == 'octet']@
+            from collections.abc import ByteString
 @[  elif isinstance(type_, BasicType) and type_.typename in CHARACTER_TYPES]@
             from collections import UserString
 @[  end if]@
@@ -606,7 +550,7 @@ bound = 1.7976931348623157e+308
                 isinstance(value, @(type_.name)), \
                 "The '@(member.name)' field must be a sub message of type '@(type_.name)'"
 @[  elif isinstance(type_, BasicType) and type_.typename == 'octet']@
-                (isinstance(value, (bytes, bytearray, memoryview)) and
+                (isinstance(value, (bytes, ByteString)) and
                  len(value) == 1), \
                 "The '@(member.name)' field must be of type 'bytes' or 'ByteString' with length 1"
 @[  elif isinstance(type_, BasicType) and type_.typename == 'char']@
@@ -656,8 +600,7 @@ bound = 1.7976931348623157e+308
 @[    if isinstance(member.type, Array)]@
         self._@(member.name) = numpy.array(value, dtype=@(SPECIAL_NESTED_BASIC_TYPES[member.type.value_type.typename]['dtype']))
 @[    elif isinstance(member.type, AbstractSequence)]@
-        # type ignore below fixed in mypy 1.17+ see mypy#19421
-        self._@(member.name) = array.array('@(SPECIAL_NESTED_BASIC_TYPES[member.type.value_type.typename]['type_code'])', value)  # type: ignore[assignment]
+        self._@(member.name) = array.array('@(SPECIAL_NESTED_BASIC_TYPES[member.type.value_type.typename]['type_code'])', value)
 @[    end if]@
 @[  else]@
         self._@(member.name) = value
