@@ -1,0 +1,12 @@
+Source: ros-jazzy-rosidl-generator-py
+Section: misc
+Priority: optional
+Maintainer: Dharini Dutia <dharini@openrobotics.org>
+Build-Depends: debhelper (>= 9.0.0), python3-numpy <!nocheck>, python3-pytest <!nocheck>, ros-jazzy-ament-cmake, ros-jazzy-ament-cmake-pytest <!nocheck>, ros-jazzy-ament-index-python <!nocheck>, ros-jazzy-ament-lint-auto <!nocheck>, ros-jazzy-ament-lint-common <!nocheck>, ros-jazzy-python-cmake-module <!nocheck>, ros-jazzy-rmw <!nocheck>, ros-jazzy-rosidl-cmake <!nocheck>, ros-jazzy-rosidl-generator-c <!nocheck>, ros-jazzy-rosidl-generator-cpp <!nocheck>, ros-jazzy-rosidl-parser <!nocheck>, ros-jazzy-rosidl-runtime-c, ros-jazzy-rosidl-typesupport-c <!nocheck>, ros-jazzy-rosidl-typesupport-fastrtps-c <!nocheck>, ros-jazzy-rosidl-typesupport-introspection-c <!nocheck>, ros-jazzy-rpyutils <!nocheck>, ros-jazzy-test-interface-files <!nocheck>, ros-jazzy-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-rosidl-generator-py
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, python3-numpy, ros-jazzy-ament-cmake, ros-jazzy-ament-cmake-cppcheck, ros-jazzy-ament-cmake-cpplint, ros-jazzy-ament-cmake-flake8, ros-jazzy-ament-cmake-pep257, ros-jazzy-ament-cmake-uncrustify, ros-jazzy-ament-index-python, ros-jazzy-python-cmake-module, ros-jazzy-rmw, ros-jazzy-rosidl-cli, ros-jazzy-rosidl-generator-c, ros-jazzy-rosidl-parser, ros-jazzy-rosidl-pycommon, ros-jazzy-rosidl-runtime-c, ros-jazzy-rosidl-typesupport-c, ros-jazzy-rosidl-typesupport-interface, ros-jazzy-rpyutils, ros-jazzy-ros-workspace
+Description: Generate the ROS interfaces in Python.
