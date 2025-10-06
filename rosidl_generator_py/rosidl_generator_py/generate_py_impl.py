@@ -18,6 +18,11 @@ import os
 import pathlib
 import sys
 
+from rosidl_cmake import convert_camel_case_to_lower_case_underscore
+from rosidl_cmake import expand_template
+from rosidl_cmake import generate_files
+from rosidl_cmake import get_newest_modification_time
+from rosidl_cmake import read_generator_arguments
 from rosidl_parser.definition import AbstractGenericString
 from rosidl_parser.definition import AbstractNestedType
 from rosidl_parser.definition import AbstractSequence
@@ -33,11 +38,6 @@ from rosidl_parser.definition import Message
 from rosidl_parser.definition import NamespacedType
 from rosidl_parser.definition import Service
 from rosidl_parser.parser import parse_idl_file
-from rosidl_pycommon import convert_camel_case_to_lower_case_underscore
-from rosidl_pycommon import expand_template
-from rosidl_pycommon import generate_files
-from rosidl_pycommon import get_newest_modification_time
-from rosidl_pycommon import read_generator_arguments
 
 SPECIAL_NESTED_BASIC_TYPES = {
     'float': {'dtype': 'numpy.float32', 'type_code': 'f'},
@@ -131,35 +131,6 @@ def generate_py(generator_arguments_file, typesupport_impls):
                 f.write(
                     f'from {package_name}.{subfolder}.{module_name} import '
                     f'{idl_stem}  # noqa: F401\n')
-                if subfolder == 'srv':
-                    f.write(
-                        f'from {package_name}.{subfolder}.{module_name} import '
-                        f'{idl_stem}_Event  # noqa: F401\n')
-                    f.write(
-                        f'from {package_name}.{subfolder}.{module_name} import '
-                        f'{idl_stem}_Request  # noqa: F401\n')
-                    f.write(
-                        f'from {package_name}.{subfolder}.{module_name} import '
-                        f'{idl_stem}_Response  # noqa: F401\n')
-                elif subfolder == 'action':
-                    f.write(
-                        f'from {package_name}.{subfolder}.{module_name} import '
-                        f'{idl_stem}_GetResult_Event  # noqa: F401\n')
-                    f.write(
-                        f'from {package_name}.{subfolder}.{module_name} import '
-                        f'{idl_stem}_GetResult_Request  # noqa: F401\n')
-                    f.write(
-                        f'from {package_name}.{subfolder}.{module_name} import '
-                        f'{idl_stem}_GetResult_Response  # noqa: F401\n')
-                    f.write(
-                        f'from {package_name}.{subfolder}.{module_name} import '
-                        f'{idl_stem}_SendGoal_Event  # noqa: F401\n')
-                    f.write(
-                        f'from {package_name}.{subfolder}.{module_name} import '
-                        f'{idl_stem}_SendGoal_Request  # noqa: F401\n')
-                    f.write(
-                        f'from {package_name}.{subfolder}.{module_name} import '
-                        f'{idl_stem}_SendGoal_Response  # noqa: F401\n')
 
     # expand templates per available typesupport implementation
     template_dir = args['template_dir']

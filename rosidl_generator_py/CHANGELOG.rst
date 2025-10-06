@@ -2,82 +2,26 @@
 Changelog for package rosidl_generator_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.22.2 (2025-10-06)
+0.14.6 (2025-10-06)
 -------------------
-* [kilted] Remove redudant numpy.array() backport `#232 <https://github.com/ros2/rosidl_python/issues/232>`_ `#236 <https://github.com/ros2/rosidl_python/issues/236>`_ (`#239 <https://github.com/ros2/rosidl_python/issues/239>`_)
+* [kilted] Remove redudant numpy.array() backport `#232 <https://github.com/ros2/rosidl_python/issues/232>`_ `#236 <https://github.com/ros2/rosidl_python/issues/236>`_ (`#240 <https://github.com/ros2/rosidl_python/issues/240>`_)
 * Contributors: mergify[bot]
 
-0.22.1 (2025-04-24)
+0.14.5 (2025-07-16)
 -------------------
-* fix (`#224 <https://github.com/ros2/rosidl_python/issues/224>`_) (`#227 <https://github.com/ros2/rosidl_python/issues/227>`_)
-  (cherry picked from commit 8aefd489b840d46c138245095402fcc50d3559f4)
-  Co-authored-by: Michael Carlstrom <rmc@carlstrom.com>
+* fix (`#224 <https://github.com/ros2/rosidl_python/issues/224>`_) (`#226 <https://github.com/ros2/rosidl_python/issues/226>`_)
 * Contributors: mergify[bot]
 
-0.22.0 (2024-04-16)
+0.14.4 (2022-11-08)
 -------------------
-* Revert install of .so files into python path (`#211 <https://github.com/ros2/rosidl_python/issues/211>`_)
-  There seems that some regression might have happened after `#195 <https://github.com/ros2/rosidl_python/issues/195>`_.
-  When removing those 2 lines, we avoid to install the .so files
-  in lib *and* python path.
-* Contributors: Matthias Schoepfer
-
-0.21.2 (2024-03-27)
--------------------
-* Prototype code for seeing if FindPython3 is usable for rosidl_python (`#140 <https://github.com/ros2/rosidl_python/issues/140>`_)
-* Contributors: Shane Loretz
-
-0.21.1 (2024-02-07)
--------------------
-* Add in a missing space. (`#203 <https://github.com/ros2/rosidl_python/issues/203>`_)
+* Humble: Backport NaN fixes (`#188 <https://github.com/ros2/rosidl_python/issues/188>`_)
 * Contributors: Chris Lalancette
 
-0.21.0 (2023-12-26)
+0.14.3 (2022-11-07)
 -------------------
-* Install compiled libraries only to 'lib' (`#195 <https://github.com/ros2/rosidl_python/issues/195>`_)
-* Contributors: Scott K Logan
-
-0.20.0 (2023-08-21)
--------------------
-* Fix: Missing dependency that causes cmake error in downstream (resolves https://github.com/ros2/rosidl_python/issues/198) (`#199 <https://github.com/ros2/rosidl_python/issues/199>`_)
-* Contributors: Isaac Saito
-
-0.19.0 (2023-04-28)
--------------------
-
-0.18.0 (2023-04-11)
--------------------
-* Hides the assertions that checks the data types of the message fields. (`#194 <https://github.com/ros2/rosidl_python/issues/194>`_)
-* Contributors: Eloy Briceno
-
-0.17.0 (2023-02-13)
--------------------
-* Service introspection (`#178 <https://github.com/ros2/rosidl_python/issues/178>`_)
-* [rolling] Update maintainers - 2022-11-07 (`#189 <https://github.com/ros2/rosidl_python/issues/189>`_)
-* Contributors: Audrow Nash, Brian
-
-0.16.1 (2022-11-02)
--------------------
-* Remove stray numpy import (`#185 <https://github.com/ros2/rosidl_python/issues/185>`_)
-* Contributors: Ben Wolsieffer
-
-0.16.0 (2022-09-13)
--------------------
-* :man_farmer: Fix NaN values bound numpy windows version (`#182 <https://github.com/ros2/rosidl_python/issues/182>`_)
-* Allow NaN values to pass floating point bounds check. (`#167 <https://github.com/ros2/rosidl_python/issues/167>`_)
-* Replace rosidl_cmake imports with rosidl_pycommon (`#177 <https://github.com/ros2/rosidl_python/issues/177>`_)
-* Change decode error mode to replace (`#176 <https://github.com/ros2/rosidl_python/issues/176>`_)
-* Merge pull request `#173 <https://github.com/ros2/rosidl_python/issues/173>`_ from ros2/quarkytale/fix_import_order
-* fix flake
-* sorting after conversion
-* Revert "Use modern cmake targets to avoid absolute paths to appear in binary archives (`#160 <https://github.com/ros2/rosidl_python/issues/160>`_)" (`#166 <https://github.com/ros2/rosidl_python/issues/166>`_)
-* Use modern cmake targets to avoid absolute paths to appear in binary archives (`#160 <https://github.com/ros2/rosidl_python/issues/160>`_)
-* michel as author
-* adding maintainer
-* Contributors: Cristóbal Arroyo, Dharini Dutia, Ivan Santiago Paunovic, Jacob Perron, Tomoya Fujita, quarkytale, Øystein Sture
-
-0.15.0 (2022-05-04)
--------------------
+* Change decode error mode to replace (`#176 <https://github.com/ros2/rosidl_python/issues/176>`_) (`#179 <https://github.com/ros2/rosidl_python/issues/179>`_)
+* Fixing generated import order (backport `#173 <https://github.com/ros2/rosidl_python/issues/173>`_) (`#183 <https://github.com/ros2/rosidl_python/issues/183>`_)
+* Contributors: mergify[bot]
 
 0.14.2 (2022-03-01)
 -------------------
