@@ -1,7 +1,7 @@
 @# Included from rosidl_generator_py/resource/_idl_support.c.em
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 @{
-from rosidl_cmake import convert_camel_case_to_lower_case_underscore
+from rosidl_pycommon import convert_camel_case_to_lower_case_underscore
 from rosidl_generator_py.generate_py_impl import SPECIAL_NESTED_BASIC_TYPES
 from rosidl_parser.definition import AbstractNestedType
 from rosidl_parser.definition import AbstractSequence
@@ -11,6 +11,8 @@ from rosidl_parser.definition import Array
 from rosidl_parser.definition import BasicType
 from rosidl_parser.definition import EMPTY_STRUCTURE_REQUIRED_MEMBER_NAME
 from rosidl_parser.definition import NamespacedType
+from rosidl_parser.definition import SERVICE_RESPONSE_MESSAGE_SUFFIX
+from rosidl_parser.definition import SERVICE_REQUEST_MESSAGE_SUFFIX
 
 
 def primitive_msg_type_to_c(type_):
@@ -119,7 +121,10 @@ if isinstance(member.type, AbstractNestedType) and isinstance(member.type.value_
 nested_header = '/'.join(type_[:-1] + ('detail', convert_camel_case_to_lower_case_underscore(type_[-1]),))
 nested_header += '__functions.h'
 }@
-@[    if nested_header in include_directives]@
+@[    if type_[-1].endswith(SERVICE_REQUEST_MESSAGE_SUFFIX) or type_[-1].endswith(SERVICE_RESPONSE_MESSAGE_SUFFIX)]
+@# Service request/response messages are included in the srv__struct
+@[continue]
+@[    elif nested_header in include_directives]@
 // already included above
 // @
 @[    else]@
@@ -153,41 +158,37 @@ PyObject * @('__'.join(type_.namespaces + [convert_camel_case_to_lower_case_unde
 
 @{
 module_name = '_' + convert_camel_case_to_lower_case_underscore(interface_path.stem)
+class_module = '%s.%s' % ('.'.join(message.structure.namespaced_type.namespaces), module_name)
+namespaced_type = message.structure.namespaced_type.name
 }@
 ROSIDL_GENERATOR_C_EXPORT
 bool @('__'.join(message.structure.namespaced_type.namespaces + [convert_camel_case_to_lower_case_underscore(message.structure.namespaced_type.name)]))__convert_from_py(PyObject * _pymsg, void * _ros_message)
 {
-@{
-full_classname = '%s.%s.%s' % ('.'.join(message.structure.namespaced_type.namespaces), module_name, message.structure.namespaced_type.name)
-}@
   // check that the passed message is of the expected Python class
   {
-    char full_classname_dest[@(len(full_classname) + 1)];
-    {
-      char * class_name = NULL;
-      char * module_name = NULL;
-      {
-        PyObject * class_attr = PyObject_GetAttrString(_pymsg, "__class__");
-        if (class_attr) {
-          PyObject * name_attr = PyObject_GetAttrString(class_attr, "__name__");
-          if (name_attr) {
-            class_name = (char *)PyUnicode_1BYTE_DATA(name_attr);
-            Py_DECREF(name_attr);
-          }
-          PyObject * module_attr = PyObject_GetAttrString(class_attr, "__module__");
-          if (module_attr) {
-            module_name = (char *)PyUnicode_1BYTE_DATA(module_attr);
-            Py_DECREF(module_attr);
-          }
-          Py_DECREF(class_attr);
-        }
-      }
-      if (!class_name || !module_name) {
-        return false;
-      }
-      snprintf(full_classname_dest, sizeof(full_classname_dest), "%s.%s", module_name, class_name);
+    PyObject * class_attr = PyObject_GetAttrString(_pymsg, "__class__");
+    if (class_attr == NULL) {
+      return false;
     }
-    assert(strncmp("@(full_classname)", full_classname_dest, @(len(full_classname))) == 0);
+    PyObject * name_attr = PyObject_GetAttrString(class_attr, "__name__");
+    if (name_attr == NULL) {
+      Py_DECREF(class_attr);
+      return false;
+    }
+    PyObject * module_attr = PyObject_GetAttrString(class_attr, "__module__");
+    if (module_attr == NULL) {
+      Py_DECREF(name_attr);
+      Py_DECREF(class_attr);
+      return false;
+    }
+
+    // PyUnicode_1BYTE_DATA is just a cast
+    assert(strncmp("@(class_module)", (char *)PyUnicode_1BYTE_DATA(module_attr), @(len(class_module))) == 0);
+    assert(strncmp("@(namespaced_type)", (char *)PyUnicode_1BYTE_DATA(name_attr), @(len(namespaced_type))) == 0);
+
+    Py_DECREF(module_attr);
+    Py_DECREF(name_attr);
+    Py_DECREF(class_attr);
   }
   @(msg_typename) * ros_message = _ros_message;
 @[for member in message.structure.members]@
