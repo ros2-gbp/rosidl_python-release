@@ -1,3 +1,26 @@
+## rosidl_python (rolling) - 0.27.2-1
+
+The packages in the `rosidl_python` repository were released into the `rolling` distro by running `/usr/local/google/home/sloretz/projects/lyrical/env3/bin/bloom-release rosidl_python --rosdistro rolling --track rolling` on `Tue, 14 Apr 2026 05:01:48 -0000`
+
+The `rosidl_generator_py` package was released.
+
+Version of package(s) in repository `rosidl_python`:
+
+- upstream repository: https://github.com/ros2/rosidl_python.git
+- release repository: https://github.com/ros2-gbp/rosidl_python-release.git
+- rosdistro version: `0.27.1-1`
+- old version: `0.27.1-1`
+- new version: `0.27.2-1`
+
+Versions of tools used:
+
+- bloom version: `0.13.0`
+- catkin_pkg version: `1.1.0`
+- rosdep version: `0.26.0`
+- rosdistro version: `1.0.1`
+- vcstools version: `0.1.42`
+
+
 ## rosidl_python (rolling) - 0.27.1-1
 
 The packages in the `rosidl_python` repository were released into the `rolling` distro by running `/usr/bin/bloom-release --rosdistro rolling --track rolling rosidl_python` on `Thu, 09 Apr 2026 13:29:41 -0000`
